@@ -42,6 +42,8 @@ DECLARE_int32(channel_send_timeout_ms);
 
 DECLARE_int32(default_thrift_client_pool_threads);
 
+DECLARE_int32(evb_notification_dequeue_size);
+
 namespace common {
 
 /*
@@ -131,7 +133,7 @@ class ThriftClientPool {
 
           evb->loopForever();
         });
-
+      evb->setMaxReadAtOnce(FLAGS_evb_notification_dequeue_size);
       evb_ = evb.release();
       last_cleanup_time_ = time(nullptr);
     }
