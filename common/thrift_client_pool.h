@@ -124,6 +124,7 @@ class ThriftClientPool {
     // Create an IO thread and an event base for this loop.
     EventLoop() {
       auto evb = std::make_unique<folly::EventBase>();
+      evb->setMaxReadAtOnce(FLAGS_evb_notification_dequeue_size);
       thread_ = std::make_unique<std::thread>([evb = evb.get()] {
           if (!folly::setThreadName("ThriftClientIO")) {
             LOG(ERROR) << "Failed to set thread name for thrift IO thread";
@@ -133,7 +134,6 @@ class ThriftClientPool {
 
           evb->loopForever();
         });
-      evb->setMaxReadAtOnce(FLAGS_evb_notification_dequeue_size);
       evb_ = evb.release();
       last_cleanup_time_ = time(nullptr);
     }
